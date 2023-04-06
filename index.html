@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JSON Tree Visualization</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        .node circle {
+            fill: #fff;
+            stroke: steelblue;
+            stroke-width: 3px;
+        }
+        .node text {
+            font: 12px sans-serif;
+            text-anchor: middle;
+            text-transform: capitalize;
+        }
+        .link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 2px;
+        }
+    </style>
+</head>
+<body>
+<script>
+    const rawData = [{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8ed"
+  },
+  "question_id": "1",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": true,
+  "is_last_question": false,
+  "question": "Do you have any history of heart disease?",
+  "options": [
+    "Yes",
+    "No",
+    "Not sure"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "2",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "3",
+      "diag_prob": []
+    },
+    {
+      "option_text": "Not sure",
+      "next_question_id": "25",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8ee"
+  },
+  "question_id": "2",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Have you experienced chest pain or discomfort in the past month?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "4",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "5",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8ef"
+  },
+  "question_id": "3",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Do you have a cough with mucus?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "6",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "7",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8f0"
+  },
+  "question_id": "4",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Are you currently experiencing chest pain or discomfort?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "8",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "9",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8f1"
+  },
+  "question_id": "5",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Have you experienced swelling in your legs, ankles or feet?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "10",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "11",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8f2"
+  },
+  "question_id": "6",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Are you a smoker or have you ever smoked?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "12",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "13",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8f3"
+  },
+  "question_id": "7",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Do you have a history of lung disease?",
+  "options": [
+    "Yes",
+    "No",
+    "Not sure"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "14",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "15",
+      "diag_prob": []
+    },
+    {
+      "option_text": "Not sure",
+      "next_question_id": "16",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8f4"
+  },
+  "question_id": "8",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "You may be experiencing a heart attack. Please seek immediate medical attention.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Heart attack",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8f5"
+  },
+  "question_id": "9",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Do you have a history of asthma?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "17",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "18",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8f6"
+  },
+  "question_id": "10",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Do you have a rapid or irregular heartbeat?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "19",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "20",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8f7"
+  },
+  "question_id": "11",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Have you recently been exposed to allergens or irritants?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "21",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "22",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8f8"
+  },
+  "question_id": "12",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Do you have a history of emphysema or chronic bronchitis?",
+  "options": [
+    "Yes",
+    "No",
+    "Not sure"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "23",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "24",
+      "diag_prob": []
+    },
+    {
+      "option_text": "Not sure",
+      "next_question_id": "24",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8f9"
+  },
+  "question_id": "13",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be caused by an infection or another underlying condition. Please see your doctor for further evaluation.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Underlying condition",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8fa"
+  },
+  "question_id": "14",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to your lung disease. Please see your doctor for further evaluation.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Lung disease",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8fb"
+  },
+  "question_id": "15",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Have you recently traveled to high altitudes or experienced changes in atmospheric pressure?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "26",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "27",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8fc"
+  },
+  "question_id": "16",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to an underlying medical condition. Please see your doctor for further evaluation.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Underlying condition",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8fd"
+  },
+  "question_id": "17",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to an asthma attack. Please seek immediate medical attention.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Asthma attack",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8fe"
+  },
+  "question_id": "18",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Do you have a history of allergies or sinusitis?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "28",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "29",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a8ff"
+  },
+  "question_id": "19",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to an irregular heartbeat. Please seek immediate medical attention.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Irregular heartbeat",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a900"
+  },
+  "question_id": "20",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to anxiety or panic disorder. Please see your doctor for further evaluation.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Anxiety / Panic attack",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a901"
+  },
+  "question_id": "21",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to an allergic reaction. Please seek medical attention if symptoms worsen.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Allergic reaction",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a902"
+  },
+  "question_id": "22",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Have you experienced any recent stress or anxiety?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "30",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "31",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a903"
+  },
+  "question_id": "23",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to emphysema or chronic bronchitis. Please seek medical attention for further evaluation.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Emphysema / Chronic bronchitis",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a904"
+  },
+  "question_id": "24",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to another underlying condition. Please see your doctor for further evaluation.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Underlying condition",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a905"
+  },
+  "question_id": "25",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Do you have a family history of heart disease?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "2",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "3",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a906"
+  },
+  "question_id": "26",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to altitude sickness. Please see your doctor or seek medical attention for further treatment.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Altitude sickness",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a907"
+  },
+  "question_id": "27",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to an underlying medical condition. Please see your doctor for further evaluation.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Underlying condition",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a908"
+  },
+  "question_id": "28",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to allergies or sinusitis. Please see your doctor for further evaluation.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Allergies / Sinusitis",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a909"
+  },
+  "question_id": "29",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": false,
+  "question": "Have you experienced any recent viral illness or infection?",
+  "options": [
+    "Yes",
+    "No"
+  ],
+  "type": "single type",
+  "next_path": [
+    {
+      "option_text": "Yes",
+      "next_question_id": "32",
+      "diag_prob": []
+    },
+    {
+      "option_text": "No",
+      "next_question_id": "33",
+      "diag_prob": []
+    }
+  ],
+  "diagnosis": "",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a90a"
+  },
+  "question_id": "30",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to stress or anxiety. Please see your doctor for further evaluation and treatment options.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Stress / Anxiety",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a90b"
+  },
+  "question_id": "31",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to an underlying medical condition. Please see your doctor for further evaluation.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Underlying condition",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a90c"
+  },
+  "question_id": "32",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to a recent viral illness or infection. Please see your doctor for further evaluation and treatment options.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Recent viral illness / infection",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "642d0a53c9de934d3290a90d"
+  },
+  "question_id": "33",
+  "chief_complaint": "Shortness of breath",
+  "is_first_question": false,
+  "is_last_question": true,
+  "question": "Your shortness of breath may be due to an underlying medical condition. Please see your doctor for further evaluation.",
+  "options": [],
+  "type": "single type",
+  "next_path": [],
+  "diagnosis": "Underlying condition",
+  "__v": 0
+}
+    ];
+
+    function createHierarchy(data) {
+        const root = {
+            name: "root",
+            children: [],
+        };
+        const questionMap = new Map();
+
+        data.forEach((question) => {
+            const optionsString = question.options.join(", ");
+            questionMap.set(question.question_id, {
+                name: question.question + (optionsString ? " [" + optionsString + "]" : ""),
+                children: [],
+                diagnosis: question.diagnosis,
+            });
+        });
+
+        data.forEach((question) => {
+            const parent = questionMap.get(question.question_id);
+            question.next_path.forEach((path) => {
+                const child = questionMap.get(path.next_question_id);
+                if (child) {
+                    parent.children.push(child);
+                }
+            });
+        });
+
+        root.children.push(questionMap.get("1"));
+        return root;
+    }
+
+    const hierarchicalData = createHierarchy(rawData);
+
+    const width = 7000;
+    const height = 5000;
+
+    const treeLayout = d3.tree().size([height, width]);
+
+    const root = d3.hierarchy(hierarchicalData);
+
+    treeLayout(root);
+
+    const svg = d3.select("body").append("svg").attr("width", width).attr("height", height);
+
+    const linkGenerator = d3.linkHorizontal().x((d) => d.y).y((d) => d.x);
+
+    svg.selectAll(".link").data(root.links()).enter().append("path").attr("class", "link").attr("d", linkGenerator);
+
+    const nodeGroup = svg.selectAll(".node").data(root.descendants()).enter().append("g").attr("class", "node").attr("transform", (d) => `translate(${d.y},${d.x})`);
+
+    nodeGroup.append("circle").attr("r", 10);
+
+    nodeGroup.append("text").attr("dy", ".35em").attr("y", (d) => (d.children ? -20 : 20)).attr("text-anchor", "middle").text((d) => {
+        if (d.data.diagnosis) {
+            return d.data.name + " (" + d.data.diagnosis + ")";
+        }
+        return d.data.name;
+    });
+
+</script>
+</body>
+</html>
+
